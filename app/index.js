@@ -26,13 +26,7 @@ import {
   showUserFormWish,
   getUserFormWish,
 } from "./member.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyA3OitJ5ox7qX4h_XtYtQf1_Fs2AYqzUeE",
   authDomain: "secret-santa-7873b.firebaseapp.com",
@@ -45,8 +39,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
 // DOM
@@ -54,7 +46,7 @@ const listContainer = document.querySelector("#list-container");
 const drawContainer = document.querySelector("#draw-container");
 const userFormNext = document.querySelector("#user-form-next");
 const userFormSubmit = document.querySelector("#user-form-submit");
-const drawBtn = document.querySelector("#draw-btn");
+// const drawBtn = document.querySelector("#draw-btn");
 
 // handler
 userFormNext.addEventListener("click", checkUserFormMember);
@@ -65,6 +57,12 @@ const currentUser = {
   uid: "",
 };
 
+// 目前團體
+const getUrlString = location.href;
+const url = new URL(getUrlString);
+const groupId = url.searchParams.get("group");
+
+// 送出名稱及生日表單
 function checkUserFormMember() {
   currentUser.name = getUserFormMember().name;
   currentUser.password = getUserFormMember().password;
@@ -84,7 +82,7 @@ function checkUserFormMember() {
 
     if (myUser.length > 0) {
       currentUser.uid = myUser[0].uid;
-      console.log(currentUser);
+      currentUser.imgUrl = myUser[0].imgUrl;
       renderUserSection(myUser[0]);
     }
   });
@@ -92,26 +90,22 @@ function checkUserFormMember() {
 
 async function checkUserName(qUserRef) {
   const qUserinfo = await getDocs(qUserRef);
+
   let userNameArr = [];
   qUserinfo.forEach((data) => {
     userNameArr.push(data.data());
   });
+
   return userNameArr;
 }
 
+// 送出願望表單
 function submitUserFormWish() {
   currentUser.imgUrl = `../asset/svg/${getUserFormWish().imgUrl}.svg`;
-  setUser().then(() => {
-    setWishList();
-  });
+  setUser();
 }
 
-// 目前團體
-const getUrlString = location.href;
-const url = new URL(getUrlString);
-const groupId = url.searchParams.get("group"); // 回傳 21
-//
-// Set user 建立使用者資料
+// 建立使用者資料、儲存願望、渲染
 async function setUser() {
   const setUserRef = doc(collection(db, "users"));
   await setDoc(setUserRef, {
@@ -121,13 +115,18 @@ async function setUser() {
     imgUrl: currentUser.imgUrl,
   }).then(() => {
     currentUser.uid = setUserRef.id;
-    console.log(currentUser);
+    setWishList().then(() => {
+      renderUserSection(currentUser);
+    });
   });
 }
 
-// Set wish list 許願
+// 寫入願望
 async function setWishList() {
-  await setDoc(doc(collection(db, "wishLists")), {
+  console.log("寫入願望");
+  const wishListRef = doc(collection(db, "wishLists"));
+  await setDoc(wishListRef, {
+    id: wishListRef.id,
     uid: currentUser?.uid,
     name: currentUser.name,
     groupId: groupId,
@@ -141,63 +140,13 @@ async function setWishList() {
   });
 }
 
-// Set junction 抽卡時建立許願關聯
-async function setJunction(giverId, groupId, wishListId) {
-  const junctionRef = doc(collection(db, "junction_wishList_user"));
-  await setDoc(junctionRef, {
-    giverId: giverId,
-    groupId: groupId,
-    wishListId: wishListId,
-  });
-}
-// setJunction("", "", "")
-
-// Update wish list 更新願望
-// const wishId = "9HEMr0xaMqVSguHlQ9IC";
-
-const updateWish = async (wishId) => {
-  await updateDoc(doc(db, "wishLists", wishId), {
-    isSelected: true,
-  });
-};
-// updateWish(wishId);
-
-// Delete wish list 刪除願望
-const deleteWish = async () => await deleteDoc(wishListRef);
-// deleteWish();
-
-// Get all wish lists by group id 用團體 id 讀取全部願望
-const qCardRef = query(
-  collection(db, "wishLists"),
-  where("groupId", "==", groupId)
-);
-const queryCards = await getDocs(qCardRef);
-renderCard(queryCards);
-
-// Get group info by group id 用團體 id 讀取團體資訊
-const groupRef = doc(db, "groups", groupId);
-const groupInfo = await getDoc(groupRef);
-renderGroupInfo(groupInfo);
-
-// Get user info by user id 用使用者 id 讀取使用者資訊
-const userRef = doc(db, "users", currentUser.uid);
-// const userInfo = await getDoc(userRef);
-
 // ---------------------------------------
 
-// 初始化
-
-function init() {
-  // 團體資訊
-  renderGroupInfo(groupInfo);
-
-  // 卡片資訊
-  renderCard(queryCards);
-
-  // 使用者資訊
-  renderUserSection(userInfo);
-}
-
+// 讀取團體資料
+const groupRef = doc(db, "groups", groupId);
+const groupInfo = await getDoc(groupRef);
+// 渲染團體資料
+renderGroupInfo(groupInfo);
 function renderGroupInfo(groupInfo) {
   let data = groupInfo.data();
 
@@ -207,11 +156,22 @@ function renderGroupInfo(groupInfo) {
 
   renderContent("title", data.title);
   renderContent("subtitle", data.subtitle);
-  renderContent("date", `${data.date.toDate().toISOString().substring(0, 10)}`);
+  renderContent(
+    "date",
+    `${data.date.toDate().toLocaleString().substring(0, 10)}`
+  );
   renderContent("rule", data.rule);
   renderContent("limit", data.wishLimit);
 }
 
+// 讀取團體願望
+const qCardRef = query(
+  collection(db, "wishLists"),
+  where("groupId", "==", groupId)
+);
+const queryCards = await getDocs(qCardRef);
+// 渲染所有願望卡片
+renderCard(queryCards);
 function renderCard(queryCards) {
   let cardHtml = "";
   queryCards.forEach((item) => {
@@ -230,7 +190,7 @@ function renderCard(queryCards) {
     <div class="list__card" data-card-id="${cardId}" data-selected="${isSelected}">
         <img class="list__receiver-avatar" src="${avatar}" alt="avatar">
         <h3 class="list__receiver-name">${receiver}</h3>
-        <ol class="list__wishes">
+        <ol class="list__wishes hidden">
             ${wishHTML}
         </ol>
     </div>
@@ -239,7 +199,9 @@ function renderCard(queryCards) {
   listContainer.innerHTML = cardHtml;
 }
 
-async function renderUserSection(data) {
+// 渲染使用者資料
+function renderUserSection(data) {
+  console.log("渲染使用者資料");
   document.querySelector("#profile-container").innerHTML = `
 
   <img src="${data.imgUrl}" alt="avatar" />
@@ -248,22 +210,21 @@ async function renderUserSection(data) {
   `;
 
   document.querySelector("#btn-container").innerHTML = `
-  <button type="buttn" class="btn" id="draw-btn">抽卡</button>
-  <button type="buttn" class="btn" id="add-btn" disabled>許願</button>`;
+  <button type="button" class="btn" id="draw-btn">抽卡</button>`;
 
   renderReceiver(currentUser.uid);
   document.querySelector("#draw-btn").addEventListener("click", drawCard);
 }
 
+// 渲染使用者抽卡資料
 async function renderReceiver(uid) {
+  // 讀取卡片&使用者關聯資料
   const qJunctionRef = query(
-    collection(db, "junction_wishList_user"),
+    collection(db, "junction"),
     where("giverId", "==", uid)
   );
-
   const queryJunction = await getDocs(qJunctionRef);
   const wishListArr = [];
-
   queryJunction.forEach((data) => {
     wishListArr.push(data.data());
   });
@@ -273,108 +234,114 @@ async function renderReceiver(uid) {
     return;
   }
 
+  // 讀取已抽到卡的資料
   const wishLists = await getDoc(
     doc(db, `wishLists/${wishListArr[0].wishListId}`)
   );
 
+  // 渲染已抽卡其卡片主人名稱
   document.querySelector("#myReceiver").innerHTML = `我要準備 <strong>${
     wishLists.data().name
   }</strong> 的禮物`;
+
+  let wishHTML = "";
+  wishLists.data().wishes.forEach((wish) => {
+    wishHTML += `<li>${wish}</li>`;
+  });
+  drawContainer.innerHTML = `
+  <div class="list__card draw" data-selected="true" data-card-id="${
+    wishLists.data().id
+  }">
+      <img class="list__receiver-avatar" src="${
+        wishLists.data().imgUrl
+      }" alt="avatar">
+      <h3 class="list__receiver-name">${wishLists.data().name}</h3>
+      <ol class="list__wishes">
+          ${wishHTML}
+      </ol>
+  </div>`;
+  document.querySelector("#draw-btn").setAttribute("disabled", "");
 }
 
-// 抽牌功能
-// 卡片是空白的
-// 抽出隨機 id 再 render 上去
-
-function drawCard() {
-  console.log("card");
-  // 取得團體中所有的卡並放入陣列 wishLists
+// 抽卡功能
+async function drawCard() {
+  console.log("抽卡");
+  // 取得團體中所有的卡並放入陣列 cardsArr
   let cardsArr = [];
   queryCards.forEach((card) => {
     cardsArr.push(card.data());
   });
 
-  // 取得團體中所有卡片的選擇關聯 junction_wishList_user
-
-  // Get selected card by group id 用團體 id 讀取團體中的抽卡關聯
-
+  // 讀取團體所有卡片&使用者關聯並放入陣列 selectedCardsArr
+  const qJunctionRef = query(
+    collection(db, "junction"),
+    where("groupId", "==", groupId)
+  );
+  const queryJunction = await getDocs(qJunctionRef);
   const selectedCardsArr = [];
-  querySelectedCards();
-  async function querySelectedCards() {
-    const qSelectedCardsRef = query(
-      collection(db, "junction_wishList_user"),
-      where("groupId", "==", groupId)
-    );
+  queryJunction.forEach((data) => {
+    selectedCardsArr.push(data.data());
+  });
+  console.log("讀取團體所有卡片&使用者關聯資料");
+  console.log(selectedCardsArr);
 
-    const selectedCards = await getDocs(qSelectedCardsRef);
-    selectedCards.forEach((card) => {
-      selectedCardsArr.push(card.data());
-    });
-    console.log(selectedCardsArr);
+  // 篩選出團體中所有"沒"被抽到的卡片 unselectedcardsArr
+  let unselectedcardsArr = cardsArr.filter((card) => {
+    return card.isSelected === false && card.uid !== currentUser.uid;
+  });
+  console.log("篩選出團體中所沒被抽到的卡片");
+  console.log(unselectedcardsArr);
 
-    // 篩選出團體中所有"沒"被選的卡來抽卡
-    let unselectedcardsArr = cardsArr.filter((card) => {
-      return card.isSelected === false && card.uid !== currentUser.uid;
-    });
+  let hasReceiver = false;
 
-    console.log(unselectedcardsArr);
+  // 關聯中的 giver id 和使用者相同表示已抽過
+  selectedCardsArr.forEach((card) => {
+    console.log("關聯中的 giver id 和使用者相同表示已抽過");
+    console.log(card.giverId);
+    console.log(currentUser.uid);
+    console.log(card.giverId === currentUser.uid);
+    if (card.giverId === currentUser.uid) {
+      hasReceiver = true;
+    }
+  });
 
-    let hasReceiver = false;
-
-    // 關聯中的 giver id 和使用者相同表示已抽過
-    selectedCardsArr.forEach((card) => {
-      console.log("關聯中的 giver id 和使用者相同表示已抽過");
-      console.log(card.giverId);
-      console.log(currentUser.uid);
-      if (card.giverId === currentUser.uid) {
-        hasReceiver = true;
-      }
-    });
-
-    console.log(hasReceiver);
-    console.log(cardsArr.length);
-
-    // 使用者已抽過，且尚有卡還沒被抽到
-    if (hasReceiver && cardsArr.length > 0) {
-      console.log("已經抽過了唷");
-      drawContainer.innerHTML = `
+  console.log("使用者抽過了嗎" + hasReceiver);
+  console.log("還有多少張沒抽過的?" + unselectedcardsArr.length);
+  // 使用者已抽過，且尚有卡還沒被抽到
+  if (hasReceiver && unselectedcardsArr.length > 0) {
+    console.log("已經抽過了唷");
+    drawContainer.innerHTML = `
           <div class="list__card-warn">
            <p>抽過了捏</p>
            <h3>(・ε・)</h3>
           </div>
           `;
-      return;
-    }
+    return;
+  }
 
-    // 卡全部抽完
-    if (cardsArr.length <= 0) {
-      drawContainer.innerHTML = `
+  // 卡全部抽完
+  if (unselectedcardsArr.length <= 0) {
+    drawContainer.innerHTML = `
           <div class="list__card-warn">
            <p>抽完了捏</p>
            <h3>¯&#92;_(ツ)_/¯</h3>
           </div>
           `;
-      return;
-    }
-
-    renderSelectedCard(unselectedcardsArr); // 記得往後放
+    return;
   }
-}
 
-function renderSelectedCard(cardsArr) {
   console.log("開始抽卡");
-  const length = cardsArr.length;
-  //  不能抽到自己的
-
-  let getRandomCard = () => {
-    let random = Math.floor(Math.random() * length);
-
-    let selectedCard = cardsArr[random];
+  const length = unselectedcardsArr.length;
+  const getRandomCard = () => {
+    const random = Math.floor(Math.random() * length);
+    const selectedCard = unselectedcardsArr[random];
     return selectedCard;
   };
+  renderSelectedCard(getRandomCard()); // 記得往後放
+}
 
-  let selectedCard = getRandomCard();
-
+// 渲染抽到的卡片
+async function renderSelectedCard(selectedCard) {
   let wishHTML = "";
   selectedCard.wishes.forEach((wish) => {
     wishHTML += `<li>${wish}</li>`;
@@ -395,7 +362,19 @@ function renderSelectedCard(cardsArr) {
   ).innerHTML = `我要準備 <strong>${selectedCard.name}</strong> 的禮物`;
 
   // 建立關聯
-  console.log(currentUser.uid);
-  setJunction(currentUser.uid, groupId, selectedCard.id);
-  updateWish(selectedCard.id);
+  console.log("抽中的卡");
+  console.log(selectedCard);
+  const junctionObj = {
+    giverId: `${currentUser.uid}`,
+    groupId: `${groupId}`,
+    wishListId: `${selectedCard.id}`,
+  };
+  console.log("要寫入的關聯資料");
+  console.log(junctionObj);
+  const junctionRef = doc(collection(db, "junction"));
+  await setDoc(junctionRef, junctionObj);
+
+  await updateDoc(doc(db, "wishLists", selectedCard.id), {
+    isSelected: true,
+  });
 }

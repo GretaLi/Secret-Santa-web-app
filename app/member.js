@@ -43,7 +43,7 @@ export const showUserFormWish = () => {
 
 export const getUserFormWish = () => {
   const myWishObj = {
-    imgUrl: document.querySelector("[name='avatar']").value,
+    imgUrl: document.querySelector("input[name='avatar']:checked").value,
     wish1: document.querySelector("#user-wish1").value,
     wish2: document.querySelector("#user-wish2").value,
     wish3: document.querySelector("#user-wish3").value,
@@ -57,8 +57,8 @@ export const getUserFormWish = () => {
   ) {
     return;
   }
-
-  //   console.log(myWishObj.imgUrl);
+  console.log(document.querySelector("[name='avatar']"));
+  // console.log(myWishObj.imgUrl);
   //   console.log(myWishObj.wish1);
   //   console.log(myWishObj.wish2);
   //   console.log(myWishObj.wish3);

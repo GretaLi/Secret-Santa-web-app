@@ -162,6 +162,10 @@ body {
   justify-content: center;
 }
 
+.list {
+  gap: 4em;
+}
+
 .list__card {
   min-width: 10em;
   display: flex;
@@ -180,6 +184,11 @@ body {
 .list__card:hover {
   transform: translateY(-0.5em);
   box-shadow: 0 0px 32px 0 hsl(var(--clr-primary), 0.6);
+}
+
+.list__wishes.hidden {
+  display: none;
+  visibility: hidden;
 }
 
 .list__card[data-selected=true] {
