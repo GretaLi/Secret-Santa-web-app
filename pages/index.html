@@ -286,10 +286,9 @@
 
     <script type="text/javascript">
       function numOnly(id) {
-        // Get the element by id
-        var element = document.getElementById(id);
-        // Use numbers only pattern, from 0 to 9 with \-
-        var regex = /[^0-9\-]/gi;
+        const element = document.getElementById(id);
+        // Use numbers only pattern, from 0 to 9
+        const regex = /[^0-9]/gi;
         // Replace other characters that are not in regex pattern
         element.value = element.value.replace(regex, "");
       }
