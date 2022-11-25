@@ -58,9 +58,82 @@ const currentUser = {
 };
 
 // 目前團體
-const getUrlString = location.href;
-const url = new URL(getUrlString);
-const groupId = url.searchParams.get("group");
+// const getUrlString = location.href;
+// const url = new URL(getUrlString);
+// const groupId = url.searchParams.get("group");
+const groupId = "QA8uhhY0DV5rvrEg4Kvd";
+
+// ---------------------------------------
+let allCardsData;
+init();
+function init() {
+  getGroupInfo();
+  getAllCards();
+}
+
+// 讀取團體資料
+async function getGroupInfo() {
+  const groupRef = doc(db, "groups", groupId);
+  await getDoc(groupRef).then((groupInfo) => {
+    renderGroupInfo(groupInfo);
+  });
+}
+// 渲染團體資料
+function renderGroupInfo(groupInfo) {
+  let data = groupInfo.data();
+
+  const renderContent = (el, text) => {
+    document.querySelector(`#${el}`).textContent = text;
+  };
+
+  renderContent("title", data.title);
+  renderContent("subtitle", data.subtitle);
+  renderContent(
+    "date",
+    `${data.date.toDate().toLocaleString().substring(0, 10)}`
+  );
+  renderContent("rule", data.rule);
+  renderContent("limit", data.wishLimit);
+}
+
+// 讀取團體願望
+async function getAllCards() {
+  const qCardRef = query(
+    collection(db, "wishLists"),
+    where("groupId", "==", groupId)
+  );
+  await getDocs(qCardRef).then((queryCards) => {
+    allCardsData = queryCards;
+    renderCard(allCardsData);
+  });
+}
+// 渲染團體所有願望卡片
+function renderCard(allCardsData) {
+  let cardHtml = "";
+  allCardsData.forEach((item) => {
+    const receiver = item.data().name;
+    const avatar = item.data().imgUrl;
+    const wishes = item.data().wishes;
+    const cardId = item.id;
+    const isSelected = item.data().isSelected;
+
+    let wishHTML = "";
+    wishes.forEach((wish) => {
+      wishHTML += `<li>${wish}</li>`;
+    });
+
+    cardHtml += `
+    <div class="list__card" data-card-id="${cardId}" data-selected="${isSelected}">
+        <img class="list__receiver-avatar" src="${avatar}" alt="avatar">
+        <h3 class="list__receiver-name">${receiver}</h3>
+        <ol class="list__wishes hidden">
+            ${wishHTML}
+        </ol>
+    </div>
+    `;
+  });
+  listContainer.innerHTML = cardHtml;
+}
 
 // 送出名稱及生日表單
 function checkUserFormMember() {
@@ -99,110 +172,6 @@ async function checkUserName(qUserRef) {
   return userNameArr;
 }
 
-// 送出願望表單
-function submitUserFormWish() {
-  currentUser.imgUrl = `../asset/svg/${getUserFormWish().imgUrl}.svg`;
-  window.scroll({
-    top: 800,
-    behavior: "smooth",
-  });
-  setUser();
-}
-
-// 建立使用者資料、儲存願望、渲染
-async function setUser() {
-  const setUserRef = doc(collection(db, "users"));
-  await setDoc(setUserRef, {
-    uid: setUserRef.id,
-    password: currentUser.password,
-    name: currentUser.name,
-    imgUrl: currentUser.imgUrl,
-  }).then(() => {
-    currentUser.uid = setUserRef.id;
-    setWishList().then(() => {
-      renderUserSection(currentUser);
-    });
-  });
-}
-
-// 寫入願望
-async function setWishList() {
-  console.log("寫入願望");
-  const wishListRef = doc(collection(db, "wishLists"));
-  await setDoc(wishListRef, {
-    id: wishListRef.id,
-    uid: currentUser?.uid,
-    name: currentUser.name,
-    groupId: groupId,
-    imgUrl: currentUser.imgUrl,
-    isSelected: false,
-    wishes: [
-      getUserFormWish().wish1,
-      getUserFormWish().wish2,
-      getUserFormWish().wish3,
-    ],
-  });
-}
-
-// ---------------------------------------
-
-// 讀取團體資料
-const groupRef = doc(db, "groups", groupId);
-const groupInfo = await getDoc(groupRef);
-// 渲染團體資料
-renderGroupInfo(groupInfo);
-function renderGroupInfo(groupInfo) {
-  let data = groupInfo.data();
-
-  const renderContent = (el, text) => {
-    document.querySelector(`#${el}`).textContent = text;
-  };
-
-  renderContent("title", data.title);
-  renderContent("subtitle", data.subtitle);
-  renderContent(
-    "date",
-    `${data.date.toDate().toLocaleString().substring(0, 10)}`
-  );
-  renderContent("rule", data.rule);
-  renderContent("limit", data.wishLimit);
-}
-
-// 讀取團體願望
-const qCardRef = query(
-  collection(db, "wishLists"),
-  where("groupId", "==", groupId)
-);
-const queryCards = await getDocs(qCardRef);
-// 渲染所有願望卡片
-renderCard(queryCards);
-function renderCard(queryCards) {
-  let cardHtml = "";
-  queryCards.forEach((item) => {
-    const receiver = item.data().name;
-    const avatar = item.data().imgUrl;
-    const wishes = item.data().wishes;
-    const cardId = item.id;
-    const isSelected = item.data().isSelected;
-
-    let wishHTML = "";
-    wishes.forEach((wish) => {
-      wishHTML += `<li>${wish}</li>`;
-    });
-
-    cardHtml += `
-    <div class="list__card" data-card-id="${cardId}" data-selected="${isSelected}">
-        <img class="list__receiver-avatar" src="${avatar}" alt="avatar">
-        <h3 class="list__receiver-name">${receiver}</h3>
-        <ol class="list__wishes hidden">
-            ${wishHTML}
-        </ol>
-    </div>
-    `;
-  });
-  listContainer.innerHTML = cardHtml;
-}
-
 // 渲染使用者資料
 function renderUserSection(data) {
   console.log("渲染使用者資料");
@@ -238,11 +207,57 @@ function renderUserSection(data) {
   });
 }
 
+// 送出願望表單
+function submitUserFormWish() {
+  currentUser.imgUrl = `../asset/svg/${getUserFormWish().imgUrl}.svg`;
+  window.scroll({
+    top: 800,
+    behavior: "smooth",
+  });
+  setUser();
+}
+
+// 建立使用者資料、儲存願望、渲染
+async function setUser() {
+  const setUserRef = doc(collection(db, "users"));
+  await setDoc(setUserRef, {
+    uid: setUserRef.id,
+    password: currentUser.password,
+    name: currentUser.name,
+    imgUrl: currentUser.imgUrl,
+  }).then(() => {
+    currentUser.uid = setUserRef.id;
+    setWishList().then(() => {
+      renderUserSection(currentUser);
+      getAllCards();
+    });
+  });
+}
+
+// 寫入願望
+async function setWishList() {
+  console.log("寫入願望");
+  const wishListRef = doc(collection(db, "wishLists"));
+  await setDoc(wishListRef, {
+    id: wishListRef.id,
+    uid: currentUser?.uid,
+    name: currentUser.name,
+    groupId: groupId,
+    imgUrl: currentUser.imgUrl,
+    isSelected: false,
+    wishes: [
+      getUserFormWish().wish1,
+      getUserFormWish().wish2,
+      getUserFormWish().wish3,
+    ],
+  });
+}
+
 // 渲染使用者抽卡資料
 async function renderReceiver(uid) {
   // 讀取卡片&使用者關聯資料
   const qJunctionRef = query(
-    collection(db, "junction"),
+    collection(db, "junctions"),
     where("giverId", "==", uid)
   );
   const queryJunction = await getDocs(qJunctionRef);
@@ -290,13 +305,13 @@ async function drawCard() {
   console.log("抽卡");
   // 取得團體中所有的卡並放入陣列 cardsArr
   let cardsArr = [];
-  queryCards.forEach((card) => {
+  allCardsData.forEach((card) => {
     cardsArr.push(card.data());
   });
 
   // 讀取團體所有卡片&使用者關聯並放入陣列 selectedCardsArr
   const qJunctionRef = query(
-    collection(db, "junction"),
+    collection(db, "junctions"),
     where("groupId", "==", groupId)
   );
   const queryJunction = await getDocs(qJunctionRef);
@@ -395,7 +410,7 @@ async function renderSelectedCard(selectedCard) {
   };
   console.log("要寫入的關聯資料");
   console.log(junctionObj);
-  const junctionRef = doc(collection(db, "junction"));
+  const junctionRef = doc(collection(db, "junctions"));
   await setDoc(junctionRef, junctionObj);
 
   await updateDoc(doc(db, "wishLists", selectedCard.id), {
