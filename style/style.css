@@ -155,6 +155,7 @@ header {
   font-size: 1.25em;
 }
 .description p {
+  letter-spacing: 2px;
   line-height: 2;
 }
 .description .highlight::after {
@@ -544,7 +545,7 @@ header {
   gap: 0.25em;
 }
 .member input[type=text],
-.member input[type=password] {
+.member input[type=number] {
   padding: 0.75em;
   border-radius: 5px;
   border: none;
@@ -552,7 +553,7 @@ header {
   font-size: 1rem;
 }
 .member input[type=text]:focus,
-.member input[type=password]:focus {
+.member input[type=number]:focus {
   outline: 5px solid hsl(var(--clr-light), 0.2);
 }
 .member input[type=submit] {
