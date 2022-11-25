@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Banana Forever | 聖誕禮物交換抽卡</title>
+    <meta
+      name="description"
+      content=" Pssst🤫今年聖誕節想試試不一樣交換禮物的玩法嗎？這是一款秘密聖誕老人抽卡系統，每人寫下心目中的三個願望後，再抽卡決定要送禮的對象
+      而對方不會知道誰送禮給他。"
+    />
+    <meta name="keywords" content="秘密聖誕老人, 聖誕交換禮物, 抽籤系統" />
+    <title>Banana Forever | 秘密聖誕老人抽卡系統</title>
     <script
       src="https://kit.fontawesome.com/4925ccd0b3.js"
       crossorigin="anonymous"
@@ -12,10 +18,8 @@
     <link rel="stylesheet" href="../style/style.css" />
     <script type="module" src="../app/member.js" defer></script>
     <script type="module" src="../app/index.js" defer></script>
-    <!-- <script type="module" src="../app/navigation.js" defer></script> -->
-    <style></style>
   </head>
-  <body class="">
+  <body>
     <header class="bg-img1 parallax">
       <nav class="nav">
         <button id="nav-toggle" class="nav__toggle">
@@ -236,80 +240,7 @@
       <div id="btn-container" class="btn__container"></div>
       <section class="wishes">
         <h2 style="text-align: center">許願卡</h2>
-        <div id="list-container" class="container list">
-          <div class="list__card">
-            <img src="../asset/svg/avatar01.svg" alt="avatar" />
-            <h3 class="list__receiver-name">塔塔</h3>
-            <ol class="list__wishes">
-              <li>願望1</li>
-              <li>願望2</li>
-              <li>願望3</li>
-            </ol>
-          </div>
-          <div class="list__card">
-            <img src="../asset/svg/avatar02.svg" alt="avatar" />
-            <h3 class="list__receiver-name">塔塔</h3>
-            <ol class="list__wishes">
-              <li>願望1</li>
-              <li>願望2</li>
-              <li>願望3</li>
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      <section class="member">
-        <!-- 註冊會員 siginup -->
-        <div class="signup container" id="signup">
-          <form class="panel">
-            <h2>註冊會員</h2>
-            <div class="input-group input-account">
-              <label for="signup-account">暱稱</label>
-              <input type="text" id="signup-account" />
-              <p class="signup-msg"></p>
-            </div>
-            <div class="input-group input-password">
-              <label for="signup-password">生日</label>
-              <input type="password" id="signup-password" />
-              <p class="signup-msg"></p>
-            </div>
-            <input type="submit" id="signup-btn" value="註冊" />
-          </form>
-
-          <p class="panel__switch-text">
-            已經是會員了嗎? <a id="open-login" href="#">登入</a>
-          </p>
-        </div>
-
-        <!-- 登入會員 login -->
-        <div class="login container" id="login">
-          <form class="panel">
-            <h2>登入會員</h2>
-            <div class="input-group">
-              <label for="login-account">暱稱</label>
-              <input type="text" id="login-account" />
-              <p class="login-msg"></p>
-            </div>
-            <div class="input-group">
-              <label for="login-password">生日</label>
-              <input type="password" id="login-password" />
-              <p class="login-msg"></p>
-            </div>
-            <input type="submit" id="login-btn" value="登入" />
-          </form>
-
-          <p class="panel__switch-text">
-            還沒註冊會員? <a href="#" id="open-signup">註冊</a>
-          </p>
-        </div>
-
-        <!-- 註冊/登入成功 Success Card-->
-        <div class="container success">
-          <div class="panel">
-            <i class="fa-solid fa-circle-check"></i>
-            <p class="success-msg"></p>
-          </div>
-        </div>
+        <div id="list-container" class="container list"></div>
       </section>
     </main>
 
