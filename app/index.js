@@ -102,6 +102,10 @@ async function checkUserName(qUserRef) {
 // 送出願望表單
 function submitUserFormWish() {
   currentUser.imgUrl = `../asset/svg/${getUserFormWish().imgUrl}.svg`;
+  window.scroll({
+    top: 800,
+    behavior: "smooth",
+  });
   setUser();
 }
 
@@ -206,14 +210,32 @@ function renderUserSection(data) {
 
   <img src="${data.imgUrl}" alt="avatar" />
   <h3>${data.name}</h3>
-  <p id="myReceiver"></p>
+  <p class="highlight" id="myReceiver"></p>
   `;
 
-  document.querySelector("#btn-container").innerHTML = `
-  <button type="button" class="btn" id="draw-btn">抽卡</button>`;
-
   renderReceiver(currentUser.uid);
-  document.querySelector("#draw-btn").addEventListener("click", drawCard);
+
+  document.querySelector("#btn-container").innerHTML = `
+  <button type="button" class="btn" id="draw-open-btn">抽卡</button>`;
+
+  const drawMsgContainer = document.querySelector("#draw-msg");
+  document.querySelector("#draw-open-btn").addEventListener("click", () => {
+    drawMsgContainer.classList.add("active");
+    document
+      .querySelector("#draw-msg .btn__container")
+      .addEventListener("click", (e) => {
+        if (e.target.id === "draw-btn") {
+          drawMsgContainer.classList.remove("active");
+          drawCard();
+          return;
+        }
+
+        if (e.target.id === "draw-close-btn") {
+          drawMsgContainer.classList.remove("active");
+          return;
+        }
+      });
+  });
 }
 
 // 渲染使用者抽卡資料
@@ -260,7 +282,7 @@ async function renderReceiver(uid) {
           ${wishHTML}
       </ol>
   </div>`;
-  document.querySelector("#draw-btn").setAttribute("disabled", "");
+  document.querySelector("#draw-open-btn").setAttribute("disabled", "");
 }
 
 // 抽卡功能
@@ -360,6 +382,8 @@ async function renderSelectedCard(selectedCard) {
   document.querySelector(
     "#myReceiver"
   ).innerHTML = `我要準備 <strong>${selectedCard.name}</strong> 的禮物`;
+
+  document.querySelector("#draw-open-btn").setAttribute("disabled", "");
 
   // 建立關聯
   console.log("抽中的卡");

@@ -15,8 +15,8 @@
     <!-- <script type="module" src="../app/navigation.js" defer></script> -->
     <style></style>
   </head>
-  <body>
-    <header>
+  <body class="">
+    <header class="bg-img1 parallax">
       <nav class="nav">
         <button id="nav-toggle" class="nav__toggle">
           <i class="fa-solid fa-bars"></i>
@@ -26,26 +26,40 @@
           <li id="login-toggle" class="login__toggle">登入</li>
         </ul>
       </nav>
-      <div class="banner">
-        <h1 id="title" class="title">Banana Foever</h1>
+      <div class="header__title">
+        <h1 id="title" class="title">Banana Forever</h1>
         <h2 id="subtitle" class="subtitle">聖誕禮物交換</h2>
       </div>
 
       <div class="description">
-        <img src="../asset/BN.jpg" alt="" />
         <div>
-          <p>日期: <span id="date"></span></p>
-          <p>金額: <span id="rule"></span></p>
-          <p>規則: 請用 <span id="limit"></span> 個形容詞</p>
-          <p style="line-height: 1.25; margin-top: 1em">
+          <p class="highlight">日期 | <span id="date"></span></p>
+          <p class="highlight">金額 | <span id="rule"></span></p>
+          <p class="highlight">
+            規則 | 用 <span id="limit"></span> 個形容詞許願
+          </p>
+          <p>
             <small
-              >待全數成員都許完願後<br />每人抽卡決定要送禮的對象<br />對方不會知道誰送禮給他</small
+              >等待全數成員都許願完畢後<br />每人抽卡決定要送禮的對象<br />而對方不會知道誰送禮給他</small
             >
           </p>
         </div>
       </div>
     </header>
     <main>
+      <div style="display: flex">
+        <img
+          style="
+            max-width: 20em;
+            width: 100%;
+            margin: auto;
+            filter: opacity(80%) saturate(130%);
+          "
+          src="../asset/BN.jpg"
+          alt=""
+        />
+      </div>
+
       <section class="user" id="user">
         <div id="profile-container" class="user__profile">
           <form
@@ -81,13 +95,14 @@
           </form>
           <form action="" id="user-form2" class="user__form form2 member">
             <div id="input-avatar" class="input-avatar noselect">
-              <h4>選擇頭像</h4>
+              <h4>選擇聖誕球球</h4>
               <div class="flex">
                 <input
                   type="radio"
                   name="avatar"
                   id="avatar01"
                   value="avatar01"
+                  checked
                 />
                 <label
                   for="avatar01"
@@ -203,7 +218,11 @@
                   required
                 />
               </div>
-              <button type="submit" id="user-form-submit" class="btn">
+              <button
+                type="submit"
+                id="user-form-submit"
+                class="btn btn-secondary"
+              >
                 送出
               </button>
             </div>
@@ -213,6 +232,7 @@
       <section class="container draw">
         <div id="draw-container"></div>
       </section>
+
       <div id="btn-container" class="btn__container"></div>
       <section class="wishes">
         <h2 style="text-align: center">許願卡</h2>
@@ -292,6 +312,20 @@
         </div>
       </section>
     </main>
+
+    <div class="container draw-msg" id="draw-msg">
+      <div class="panel">
+        <i class="fa-solid fa-circle-question"></i>
+        <p>確定要抽卡嗎?<br /><small>大家都許好願望才開始抽卡唷</small></p>
+        <div class="btn__container">
+          <button type="button" class="btn btn-secondary" id="draw-btn">
+            抽卡
+          </button>
+          <button type="button" class="btn" id="draw-close-btn">取消</button>
+        </div>
+      </div>
+    </div>
+
     <footer>
       <p>Coded with ❤️ by Greta Li ©2022</p>
     </footer>
