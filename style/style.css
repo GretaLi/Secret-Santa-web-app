@@ -202,6 +202,17 @@ header {
 .user .user__form .input-group {
   width: 100%;
 }
+.user .user__form .user-birthday-msg {
+  display: none;
+  text-align: left;
+  bottom: -1.5em;
+  color: hsl(var(--clr-accent));
+  font-weight: 400;
+  font-size: 0.8em;
+}
+.user .user__form .user-birthday-msg.active {
+  display: block;
+}
 .user .user__form .input-avatar {
   margin-top: 3em;
   margin-bottom: 3em;

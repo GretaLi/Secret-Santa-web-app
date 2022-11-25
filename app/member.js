@@ -26,6 +26,13 @@ export const getUserFormMember = () => {
     return;
   }
 
+  if (myUserObj.password.length < 4) {
+    document.querySelector(".user-birthday-msg").classList.add("active");
+    return;
+  } else {
+    document.querySelector(".user-birthday-msg").classList.remove("active");
+  }
+
   localStorage.setItem("myName", myUserObj.name);
   localStorage.setItem("myBirthday", myUserObj.password);
 
@@ -57,7 +64,7 @@ export const getUserFormWish = () => {
   ) {
     return;
   }
-  console.log(document.querySelector("[name='avatar']"));
+
   // console.log(myWishObj.imgUrl);
   //   console.log(myWishObj.wish1);
   //   console.log(myWishObj.wish2);
