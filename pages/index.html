@@ -14,7 +14,6 @@
       content=" Pssst🤫今年聖誕節想試試不一樣交換禮物的玩法嗎？這是一款秘密聖誕老人抽卡系統，每人寫下心目中的三個願望後，再抽卡決定要送禮的對象
       而對方不會知道誰送禮給他，就在聚會當天一起揭曉大家的願望吧！🎄🎁✨"
     />
-
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta
@@ -26,6 +25,10 @@
       property="og:description"
       content=" Pssst🤫今年聖誕節想試試不一樣交換禮物的玩法嗎？這是一款秘密聖誕老人抽卡系統，每人寫下心目中的三個願望後，再抽卡決定要送禮的對象
       而對方不會知道誰送禮給他，就在聚會當天一起揭曉大家的願望吧！🎄🎁✨"
+    />
+    <link
+      rel="canonical"
+      href="https://gretali.github.io/Secret-Santa-web-app/pages/index.html"
     />
     <script
       src="https://kit.fontawesome.com/4925ccd0b3.js"
@@ -105,7 +108,9 @@
                 id="user-birthday"
                 name="birthday"
                 placeholder="0908"
+                oninput="numOnly(this.id);"
                 maxlength="4"
+                pattern="[0-9]{4}"
                 required
               />
             </div>
@@ -276,6 +281,16 @@
     <footer>
       <p>Coded with ❤️ by Greta Li ©2022</p>
     </footer>
-    <!-- firebase -->
+
+    <script type="text/javascript">
+      function numOnly(id) {
+        // Get the element by id
+        var element = document.getElementById(id);
+        // Use numbers only pattern, from 0 to 9 with \-
+        var regex = /[^0-9\-]/gi;
+        // Replace other characters that are not in regex pattern
+        element.value = element.value.replace(regex, "");
+      }
+    </script>
   </body>
 </html>
