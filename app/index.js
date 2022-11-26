@@ -173,7 +173,7 @@ async function checkUserName(qUserRef) {
 
 // 渲染使用者資料
 function renderUserSection(data) {
-  console.log("渲染使用者資料");
+  // console.log("渲染使用者資料");
   document.querySelector("#profile-container").innerHTML = `
 
   <img src="${data.imgUrl}" alt="avatar" />
@@ -235,7 +235,7 @@ async function setUser() {
 
 // 寫入願望
 async function setWishList() {
-  console.log("寫入願望");
+  // console.log("寫入願望");
   const wishListRef = doc(collection(db, "wishLists"));
   await setDoc(wishListRef, {
     id: wishListRef.id,
@@ -301,7 +301,7 @@ async function renderReceiver(uid) {
 
 // 抽卡功能
 async function drawCard() {
-  console.log("抽卡");
+  // console.log("抽卡");
   // 取得團體中所有的卡並放入陣列 cardsArr
   let cardsArr = [];
   const qCardRef = query(
@@ -313,16 +313,16 @@ async function drawCard() {
       cardsArr.push(card.data());
     });
   });
-  console.log("取得團體中所有的卡並放入陣列 cardsArr");
-  console.log(cardsArr);
+  // console.log("取得團體中所有的卡並放入陣列 cardsArr");
+  // console.log(cardsArr);
 
   // 篩選出團體中所有"沒"被抽到的卡片 unselectedcardsArr
   let unselectedcardsArr = cardsArr.filter((card) => {
     return card.isSelected === false && card.uid !== currentUser.uid;
   });
-  console.log("篩選出團體中所沒被抽到的卡片");
-  console.log(unselectedcardsArr);
-  console.log("還有多少張沒抽過的?" + unselectedcardsArr.length);
+  // console.log("篩選出團體中所沒被抽到的卡片");
+  // console.log(unselectedcardsArr);
+  // console.log("還有多少張沒抽過的?" + unselectedcardsArr.length);
 
   // 卡全部抽完
   if (unselectedcardsArr.length <= 0) {
@@ -335,7 +335,7 @@ async function drawCard() {
     return;
   }
 
-  console.log("開始抽卡");
+  // console.log("開始抽卡");
   const length = unselectedcardsArr.length;
   const getRandomCard = () => {
     const random = Math.floor(Math.random() * length);
@@ -369,15 +369,15 @@ async function renderSelectedCard(selectedCard) {
   document.querySelector("#draw-open-btn").setAttribute("disabled", "");
 
   // 建立關聯
-  console.log("抽中的卡");
-  console.log(selectedCard);
+  // console.log("抽中的卡");
+  // console.log(selectedCard);
   const junctionObj = {
     giverId: `${currentUser.uid}`,
     groupId: `${groupId}`,
     wishListId: `${selectedCard.id}`,
   };
-  console.log("要寫入的關聯資料");
-  console.log(junctionObj);
+  // console.log("要寫入的關聯資料");
+  // console.log(junctionObj);
   const junctionRef = doc(collection(db, "junctions"));
   await setDoc(junctionRef, junctionObj);
 
