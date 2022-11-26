@@ -64,7 +64,7 @@ const currentUser = {
 const groupId = "QA8uhhY0DV5rvrEg4Kvd";
 
 // ---------------------------------------
-let allCardsData;
+
 init();
 function init() {
   getGroupInfo();
@@ -103,8 +103,7 @@ async function getAllCards() {
     where("groupId", "==", groupId)
   );
   await getDocs(qCardRef).then((queryCards) => {
-    allCardsData = queryCards;
-    renderCard(allCardsData);
+    renderCard(queryCards);
   });
 }
 // 渲染團體所有願望卡片
@@ -305,22 +304,17 @@ async function drawCard() {
   console.log("抽卡");
   // 取得團體中所有的卡並放入陣列 cardsArr
   let cardsArr = [];
-  allCardsData.forEach((card) => {
-    cardsArr.push(card.data());
-  });
-
-  // 讀取團體所有卡片&使用者關聯並放入陣列 selectedCardsArr
-  const qJunctionRef = query(
-    collection(db, "junctions"),
+  const qCardRef = query(
+    collection(db, "wishLists"),
     where("groupId", "==", groupId)
   );
-  const queryJunction = await getDocs(qJunctionRef);
-  const selectedCardsArr = [];
-  queryJunction.forEach((data) => {
-    selectedCardsArr.push(data.data());
+  await getDocs(qCardRef).then((queryCards) => {
+    queryCards.forEach((card) => {
+      cardsArr.push(card.data());
+    });
   });
-  console.log("讀取團體所有卡片&使用者關聯資料");
-  console.log(selectedCardsArr);
+  console.log("取得團體中所有的卡並放入陣列 cardsArr");
+  console.log(cardsArr);
 
   // 篩選出團體中所有"沒"被抽到的卡片 unselectedcardsArr
   let unselectedcardsArr = cardsArr.filter((card) => {
@@ -328,33 +322,7 @@ async function drawCard() {
   });
   console.log("篩選出團體中所沒被抽到的卡片");
   console.log(unselectedcardsArr);
-
-  let hasReceiver = false;
-
-  // 關聯中的 giver id 和使用者相同表示已抽過
-  selectedCardsArr.forEach((card) => {
-    console.log("關聯中的 giver id 和使用者相同表示已抽過");
-    console.log(card.giverId);
-    console.log(currentUser.uid);
-    console.log(card.giverId === currentUser.uid);
-    if (card.giverId === currentUser.uid) {
-      hasReceiver = true;
-    }
-  });
-
-  console.log("使用者抽過了嗎" + hasReceiver);
   console.log("還有多少張沒抽過的?" + unselectedcardsArr.length);
-  // 使用者已抽過，且尚有卡還沒被抽到
-  if (hasReceiver && unselectedcardsArr.length > 0) {
-    console.log("已經抽過了唷");
-    drawContainer.innerHTML = `
-          <div class="list__card-warn">
-           <p>抽過了捏</p>
-           <h3>(・ε・)</h3>
-          </div>
-          `;
-    return;
-  }
 
   // 卡全部抽完
   if (unselectedcardsArr.length <= 0) {
