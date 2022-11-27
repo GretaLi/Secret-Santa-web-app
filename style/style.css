@@ -121,16 +121,17 @@ body ::selection {
   position: relative;
 }
 
-header {
+.header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 1em;
+  justify-content: center;
+  gap: 2em;
+  padding: 2em 1em 4em;
   font-family: "Noto Serif TC", serif;
 }
-
 .header__title {
-  padding: 10vh 0 5vh;
+  padding: 5% 0;
   text-align: center;
 }
 .header__title .title,
@@ -139,9 +140,7 @@ header {
   color: hsl(var(--clr-white));
   text-shadow: 0 0px 4px hsl(var(--clr-dark), 0.5);
 }
-
-.description {
-  margin: auto 0;
+.header__description {
   padding: 2em 2em;
   background: hsl(var(--clr-primary), 0.1);
   -webkit-backdrop-filter: blur(10px);
@@ -154,21 +153,21 @@ header {
   color: hsl(var(--clr-white));
   font-size: 1.25em;
 }
-.description p {
+.header__description p {
   letter-spacing: 2px;
   line-height: 2;
 }
-.description .highlight::after {
+.header__description .highlight::after {
   bottom: 0.25em;
   background: hsl(var(--clr-accent), 0.8);
 }
-.description p:last-child {
+.header__description p:last-child {
   margin-top: 1em;
   line-height: 1.75;
   letter-spacing: 4px;
 }
 @media (min-width: 600px) {
-  .description {
+  .header__description {
     padding: 2em 4em;
   }
 }
