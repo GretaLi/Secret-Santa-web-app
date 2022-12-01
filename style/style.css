@@ -387,6 +387,9 @@ body ::selection {
 }
 
 .list__card.draw {
+  width: 80%;
+  margin: auto;
+  max-width: 25em;
   border-right: 1px solid hsl(var(--clr-secondary));
   border-left: 1px solid hsl(var(--clr-secondary));
   border-bottom: 1px solid hsl(var(--clr-secondary));
