@@ -356,7 +356,7 @@ body ::selection {
   min-width: 16em;
   padding: 2em 4em;
   border-radius: 10px;
-  border-top: 0.5em solid hsl(var(--clr-primary));
+  border-top: 0.5em solid hsl(var(--clr-secondary));
   background: hsl(var(--clr-white));
   box-shadow: 0 0px 32px 0 hsl(var(--clr-primary), 0.2);
   line-height: 1.75;
